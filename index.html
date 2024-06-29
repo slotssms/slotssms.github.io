@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="Slot State Space Models.">
+  <meta name="keywords" content="SlotSSMs, Slot Mamba, SlotMamba, Video Understanding, Representation Learning, State Space Models">
+  <meta name="author" content="Jindong Jiang, Fei Deng, Gautam Singh, Minseung Lee, Sungjin Ahn"
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SlotSSMs: Slot State Space Models</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <!-- <link rel="icon" href="./static/images/favicon.svg"> -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    integrity="sha512-iBBXm8fW90+nuLcSßKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+
+  <script type="module">
+
+    // update img src when choose other dataset, ffhq composition
+    const emerging_modularity_radioButtons = document.querySelectorAll('input[name="emerging-modularity-real-world"]')
+    for (const radioButton of emerging_modularity_radioButtons) {
+      radioButton.addEventListener('change', show)
+      function show() {
+        let assetUrl = new URL('./static/gifs/' + radioButton.value + '/more_samples.gif', import.meta.url)
+        document.getElementById('emerging-modularity-real-world').src = assetUrl
+      }
+    }
+    emerging_modularity_radioButtons[0].click()
+
+  </script>
+</head>
+
+<body>
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+<div class="navbar-brand">
+  <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+    <span aria-hidden="true"></span>
+    <span aria-hidden="true"></span>
+    <span aria-hidden="true"></span>
+  </a>
+</div>
+<div class="navbar-menu">
+  <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
+    <a class="navbar-item" href="https://jindongjiang.me">
+    <span class="icon">
+        <i class="fas fa-home"></i>
+    </span>
+    </a>
+
+    <div class="navbar-item has-dropdown is-hoverable">
+      <a class="navbar-link">
+        More Research
+      </a>
+      <div class="navbar-dropdown">
+        <a class="navbar-item" href="https://github.com/JindongJiang/GNM">
+          GNM
+        </a>
+        <a class="navbar-item" href="https://sites.google.com/view/gswm/home">
+          G-SWM
+        </a>
+        <a class="navbar-item" href="https://sites.google.com/view/scalor">
+          SCALOR
+        </a>
+        <a class="navbar-item" href="https://sites.google.com/view/space-project-page">
+          SPACE
+        </a>
+        <a class="navbar-item" href="https://latentslotdiffusion.github.io/">
+          Latent Slot Diffusion
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+</nav>
+
+
+  <section class="hero" style="margin-bottom: 0px;">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">SlotSSMs: Slot State Space Models</h1>
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">
+                <a href="https://jindongjiang.me">Jindong Jiang</a><sup>1</sup>,</span>
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?hl=en&user=F-V72fUAAAAJ&view_op=list_works&sortby=pubdate">Fei Deng</a><sup>1</sup>,</span>
+              <span class="author-block">
+                <a href="https://singhgautam.github.io/">Gautam Singh</a><sup>1</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://mlml.kaist.ac.kr/9b335270-f27b-477b-85ea-0bcaacdbc539">Minseung Lee</a><sup>2</sup>,
+              </span>
+              <div class="centered-author">
+                <span class="author-block">
+                  <a href="https://mlml.kaist.ac.kr/sungjinahn">Sungjin Ahn</a><sup>2</sup>
+                </span>
+              </div>
+            </div>
+
+            <div class="is-size-5 publication-authors">
+              <span class="author-block"><sup>1</sup>Rutgers University,</span>
+              <span class="author-block"><sup>2</sup>KAIST</span>
+            </div>
+
+            <div class="column has-text-centered">
+              <div class="publication-links">
+                <span class="link-block">
+                  <a href="https://arxiv.org/abs/2406.12272" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                    </span>
+                    <span>arXiv</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fab fa-github"></i>
+                    </span>
+                    <span>Code (Coming Soon)</span>
+                  </a>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="hero-body">
+        <!-- <figcaption class="has-text-centered" style="font-size: 18px; margin-bottom: 0px;">
+          TikTok Dataset
+        </figcaption> -->
+        <img src="./static/gifs/tiktok/mask_and_depth.gif" alt="Video Decomposition on TikTok Dataset" width="100%" style="margin-bottom: 20px;" />
+        <!-- <figcaption class="has-text-centered" style="font-size: 18px; margin-bottom: 0px;">
+          UT Egocentric Dataset
+        </figcaption> -->
+        <img src="./static/gifs/egtea/mask_and_depth.gif" alt="Video Decomposition on UT Egocentric Dataset" width="100%" />
+        <p class="subtitle has-text-centered" style="font-size: 16pt; margin-top: 20px;">
+          <strong>Emergent Scene Decomposition</strong>. Colors represent the ID of slots used for predicting each position.
+          SlotSSM is capable of exploiting the inherent modular structure of real-world videos for efficient inference, without explicit segmentation supervision.
+        </p>
+      </div>
+    </div>
+  </section>
+  
+  <hr>
+
+  <section class="section">
+    <div class="container is-max-desktop">
+      <!-- Abstract. -->
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-max-desktop">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p style="font-size: 16pt;">
+              Recent State Space Models (SSMs) such as S4, S5, and Mamba have shown remarkable computational benefits in long-range temporal 
+              dependency modeling. However, many sequence modeling problems, the underlying process is inherently modular and it is of 
+              interest to have inductive biases that mimic this modular structure. In this paper, we introduce SlotSSMs, a novel framework 
+              for incorporating independent mechanisms into SSMs to preserve or encourage separation of information. Unlike conventional SSMs 
+              that maintain a monolithic state vector, <b><i>SlotSSMs maintains the state as a collection of multiple vectors called slots.
+              Crucially, the state transitions are performed independently per slot with sparse interactions across slots implemented via the 
+              bottleneck of self-attention.</i></b> In experiments, we evaluate our model in object-centric video understanding, 3D visual reasoning, 
+              and video prediction tasks, which involve modeling multiple objects and their long-range temporal dependencies. We find that our 
+              proposed design offers substantial performance gains over existing sequence modeling methods. 
+            </p>
+          </div>
+        </div>
+      </div>
+      <!--/ Abstract. -->
+
+      <hr>
+
+      <!-- Method. -->
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-max-desktop">
+          <h2 class="title is-3">Method</h2>
+          <div class="has-text-centered">
+            <img src="./static/images/method.png" alt="Method Diagram" width="100%" style="margin: 20px 0;" />
+          </div>
+          <h2 class="subtitle has-text-justified" style="margin-top: 10px;">
+            <b>SlotSSMs vs existing models.</b> (a) SlotSSMs incorporate modularity through independent state transitions and sparse 
+            interactions via self-attention. (b) Traditional SSMs utilize a monolithic state vector for all past information. (c) Multi-slot 
+            Transformer-based models offer modularity but with high computational complexity. (d) Multi-slot RNN-based models have modular 
+            states but can't parallelize training (red lock). SlotSSMs combine parallelizable training, memory efficiency, and modularity for 
+            efficient temporal modeling.
+          </h2>
+        </div>
+      </div>
+      <!--/ Method. -->
+
+      <hr>
+
+      <div class="columns is-centered">
+        <div class="column is-max-desktop">
+          <h2 class="title is-3 has-text-centered">Architecture</h2>
+          <div class="has-text-centered">
+            <img src="./static/images/architecture.png" alt="Architecture Diagram" width="80%" style="margin: 20px 0;" />
+          </div>
+          <h2 class="subtitle has-text-justified" style="margin-top: 10px;">
+            SlotSSMs are hybrid models combining SSMs and attention mechanisms. Each layer comprises:
+          </h2>
+          <dev class="subtitle has-text-justified" >
+            <ol style="font-size: 18px; line-height: 1.6; margin-left: 20px;">
+              <li><strong>Slot Encoder</strong> uses Transformer to extract compact slot representations from inputs of any size.</li>
+              <li><strong>SlotSSM</strong> independently updates these slots with separate state transitions.</li>
+              <li><strong>Slot Mixer</strong> introduces inter-slot interactions between slots through self-attention.</li>
+            </ol>
+          </dev>
+        </div>
+      </div>
+      <!--/ Method. -->
+
+      <hr>
+
+      <!-- Multi-Object Video Prediction. -->
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-max-desktop">
+          <h2 class="title is-3">Multi-Object Video Prediction</h2>
+          <div class="has-text-centered">
+            <img src="./static/images/multi-object_video_prediction/white_bouncing_balls_results.png" alt="video prediction" width="90%" style="margin: 20px 0;" />
+          </div>
+          <h2 class="subtitle has-text-centered" style="margin-top: 10px;">
+            Performance of SlotSSMs on multi-object video prediction task, demonstrating significant gains over single-state baselines and comparable performance 
+            to multi-slot transformer models. This highlights the necessity of modular state representation in video modeling.
+          </h2>
+        </div>
+      </div>
+      <!-- Multi-Object Video Prediction. -->
+
+      <hr>
+
+      <!-- Long-Context Reasoning. -->
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-max-desktop">
+          <h2 class="title is-3">Long-Context Reasoning</h2>
+          <div class="has-text-centered">
+            <img src="./static/images/long-context_reasoning/blinking_color_ball_samples.png" alt="Data Samples" width="90%" style="margin: 20px 0;" />
+            <figcaption class="subtitle has-text-centered" style="font-size: 14pt; margin-top: 0px;">
+              We introduce the Blinking Color Balls Benchmark, specifically designed to assess the capability to model multi-object interactions and long-range dependencies with sequence lengths extending up to 2560.
+            </figcaption>
+          </div>
+          <div class="has-text-centered" style="margin-top: 10px;">
+            <img src="./static/images/long-context_reasoning/blinking_color_ball_results_numbers.png" alt="Long-Context Reasoning Performance" width="90%" style="margin: 20px 0;" />
+          </div>
+          <h2 class="subtitle has-text-centered" style="margin-top: 10px;">
+            SlotSSMs demonstrate their efficiency in long-context reasoning, outperforming existing models in terms of prediction accuracy and computational efficiency.
+          </h2>
+        </div>
+      </div>
+      <!-- Long-Context Reasoning. -->
+
+      <hr>
+
+      <!-- Unsupervised Object-Centric Learning. -->
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-max-desktop">
+          <h2 class="title is-3">Unsupervised Object-Centric Learning</h2>
+          <div class="has-text-centered" style="margin-top: 10px;">
+            <img src="./static/images/object-centric_learning/oc_seg_performance.png" alt="Object-Centric Learning Performance" width="100%" style="margin: 20px 0;" />
+          </div>
+          <h2 class="subtitle has-text-centered" style="margin-top: 0px;">
+            We propose the OC-SlotSSMs variant for unsupervised object-centric representation learning. OC-SlotSSMs outperform existing methods in both unsupervised object segmentation and downstream property prediction.
+          </h2>
+        </div>
+      </div>
+      <!-- Unsupervised Object-Centric Learning. -->
+
+      <hr>
+
+      <!-- 3D Visual Reasoning. -->
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-max-desktop">
+          <h2 class="title is-3">3D Visual Reasoning</h2>
+          <div class="has-text-centered" style="margin-top: 10px;">
+            <img src="./static/images/3D_visual_reasoning/cater_performance.png" alt="3D Visual Reasoning" width="70%" style="margin: 20px 0;" />
+          </div>
+          <h2 class="subtitle has-text-centered" style="margin-top: 0px;">
+            We evaluate SlotSSMs on the CATER dataset, a challenging 3D visual reasoning benchmark. 
+            OC-SlotSSMs achieve superior performance on both direct training and pre-training + fine-tuning settings.
+          </h2>
+        </div>
+      </div>
+      <!-- 3D Visual Reasoning. -->
+
+      <hr>
+
+      <!-- Real-World Emergent Modularity. -->
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-max-desktop">
+          <h2 class="title is-3">Emergent Modularity in Real-World Videos</h2>
+          <p>&nbsp;</p>
+          <div class="columns is-centered" style="position: relative;">
+            <div class="control has-text-centered">
+              <label class="radio" style="font-size: 20px;">
+                <input value="tiktok" type="radio" name="emerging-modularity-real-world"> TikTok Dataset
+              </label>
+              <label class="radio" style="font-size: 20px;">
+                <input value="egtea" type="radio" name="emerging-modularity-real-world"> UT Egocentric Dataset
+              </label>
+            </div>
+          </div>
+          <div id="pose_loading" style="position: absolute; left: 50%; top: 45%;"></div>
+          <img src="./static/gifs/tiktok/more_samples.gif" id="emerging-modularity-real-world" width="80%" alt="Emergent Modularity in Real-World Videos">
+          <p>&nbsp;</p>
+          <h2 class="subtitle has-text-centered" style="margin-top: 0px;">
+            We applied OC-SlotSSMs to a depth estimation task on real-world datasets. SlotSSMs is capable of exploiting modular representations 
+            to understand scene structures in real-world videos, without explicit segmentation supervision. We show slot decomposition and depth estimation in the videos.
+          </h2>
+          <h2 class="subtitle has-text-centered ps-section" style="margin-top: 0px;">
+            Note that, in this task, our goal is not to surpass existing depth estimation models but to use this task, manageable with our 
+            lab resources, to showcase the emerging modularity in SlotSSMs for real-world video processing. For the TikTok dataset, we manually changed the 
+            colors for two background slots to grey for <del>fancier</del> cleaner visualization. 
+            Details of this experiment will be updated in the arXiv manuscript soon.
+          </h2>
+        </div>
+      </div>
+      <!-- Real-World Emergent Modularity. -->
+
+    </div>
+  </section>
+
+  <hr>
+
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <h2 class="title is-3">BibTeX</h2>
+      <pre><code>@article{jiang2024slot,
+    title = {Slot State Space Models},
+    author = {Jiang, Jindong and Deng, Fei and Singh, Gautam and Lee, Minseung and Ahn, Sungjin},
+    journal = {arXiv preprint arXiv:2406.12272},
+    year = {2024}
+  }</code></pre>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <p class="has-text-centered">
+          This website is adapted from <a href="https://latentslotdiffusion.github.io/">LSD</a>, which is based on a template by 
+          <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a>. It is licensed under a 
+          <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+
+</html>
