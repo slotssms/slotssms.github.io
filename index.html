@@ -219,13 +219,13 @@
             <img src="./static/images/architecture.png" alt="Architecture Diagram" width="80%" style="margin: 20px 0;" />
           </div>
           <h2 class="subtitle has-text-justified" style="margin-top: 10px;">
-            SlotSSMs are hybrid models combining SSMs and attention mechanisms. Each layer comprises:
+            SlotSSMs are fully parallelized sequential process models that combine SSMs and Transformers. Each layer comprises:
           </h2>
           <dev class="subtitle has-text-justified" >
             <ol style="font-size: 18px; line-height: 1.6; margin-left: 20px;">
-              <li><strong>Slot Encoder</strong> uses Transformer to extract compact slot representations from inputs of any size.</li>
-              <li><strong>SlotSSM</strong> independently updates these slots with separate state transitions.</li>
-              <li><strong>Slot Mixer</strong> introduces inter-slot interactions between slots through self-attention.</li>
+              <li><strong>Slot Encoder</strong>: Utilizes a Transformer to extract compact slot representations from inputs of any size.</li>
+              <li><strong>SlotSSM</strong>: Independently updates these slots over time using separate state transitions.</li>
+              <li><strong>Slot Mixer</strong>: Facilitates inter-slot interactions through self-attention mechanisms.</li>
             </ol>
           </dev>
         </div>
