@@ -31,16 +31,22 @@
 
   <script type="module">
 
-    // update img src when choose other dataset, ffhq composition
-    const emerging_modularity_radioButtons = document.querySelectorAll('input[name="emerging-modularity-real-world"]')
-    for (const radioButton of emerging_modularity_radioButtons) {
-      radioButton.addEventListener('change', show)
-      function show() {
-        let assetUrl = new URL('./static/gifs/' + radioButton.value + '/more_samples.gif', import.meta.url)
-        document.getElementById('emerging-modularity-real-world').src = assetUrl
-      }
+    // Function to update image based on model selection
+    function updateImage(dataset, model) {
+      const imgElement = document.getElementById(`${dataset}-results`);
+      const path = `./static/gifs/${dataset}/${model}/more_samples.gif`;
+      imgElement.src = new URL(path, import.meta.url);
     }
-    emerging_modularity_radioButtons[0].click()
+
+    // Setup radio button handlers for each dataset
+    ['tiktok', 'egtea', 'waymo'].forEach(dataset => {
+      const radioButtons = document.querySelectorAll(`input[name="${dataset}-model"]`);
+      radioButtons.forEach(radio => {
+        radio.addEventListener('change', () => updateImage(dataset, radio.value));
+      });
+      // Set default selection
+      radioButtons[0].checked = true;
+    });
 
   </script>
 </head>
@@ -150,11 +156,15 @@
   <section class="hero teaser">
     <div class="container is-max-desktop">
       <div class="hero-body">
-        <img src="./static/gifs/tiktok/mask_and_depth.gif" alt="Video Decomposition on TikTok Dataset" width="100%" style="margin-bottom: 0px;" />
+        <img src="./static/gifs/tiktok/slotssm/mask_and_depth.gif" alt="Video Decomposition on TikTok Dataset" width="100%" style="margin-bottom: 0px;" />
         <figcaption class="has-text-centered" style="font-size: 18px; margin-bottom: 5px;">
           TikTok Dataset
         </figcaption>
-        <img src="./static/gifs/egtea/mask_and_depth.gif" alt="Video Decomposition on UT Egocentric Dataset" width="100%" />
+        <img src="./static/gifs/waymo/slotssm/mask_and_depth.gif" alt="Video Decomposition on Waymo Dataset" width="100%" style="margin-bottom: 0px;" />
+        <figcaption class="has-text-centered" style="font-size: 18px; margin-bottom: 5px;">
+          Waymo Dataset
+        </figcaption>
+        <img src="./static/gifs/egtea/slotssm/mask_and_depth.gif" alt="Video Decomposition on UT Egocentric Dataset" width="100%" />
         <figcaption class="has-text-centered" style="font-size: 18px; margin-bottom: 5px;">
           UT Egocentric Dataset
         </figcaption>
@@ -182,9 +192,9 @@
               for incorporating independent mechanisms into SSMs to preserve or encourage separation of information. Unlike conventional SSMs 
               that maintain a monolithic state vector, <b><i>SlotSSMs maintains the state as a collection of multiple vectors called slots.
               Crucially, the state transitions are performed independently per slot with sparse interactions across slots implemented via the 
-              bottleneck of self-attention.</i></b> In experiments, we evaluate our model in object-centric video understanding, 3D visual reasoning, 
-              and video prediction tasks, which involve modeling multiple objects and their long-range temporal dependencies. We find that our 
-              proposed design offers substantial performance gains over existing sequence modeling methods. 
+              bottleneck of self-attention.</i></b> In experiments, we evaluate our model in object-centric learning, 3D visual reasoning, and 
+              long-context video understanding tasks, which involve modeling multiple objects and their long-range temporal dependencies. 
+              We find that our proposed design offers substantial performance gains over existing sequence modeling methods. 
             </p>
           </div>
         </div>
@@ -307,37 +317,64 @@
 
       <hr>
 
-      <!-- Real-World Emergent Modularity. -->
+      <!-- TikTok Dataset Results -->
       <div class="columns is-centered has-text-centered">
         <div class="column is-max-desktop">
           <h2 class="title is-3">Emergent Modularity in Real-World Videos</h2>
-          <p>&nbsp;</p>
+          <h3 class="title is-4">TikTok Dataset Results</h3>
+          <!-- <p>&nbsp;</p> -->
           <div class="columns is-centered" style="position: relative;">
             <div class="control has-text-centered">
               <label class="radio" style="font-size: 20px;">
-                <input value="tiktok" type="radio" name="emerging-modularity-real-world"> TikTok Dataset
+                <input value="slotssm" type="radio" name="tiktok-model"> SlotSSM (Ours)
               </label>
               <label class="radio" style="font-size: 20px;">
-                <input value="egtea" type="radio" name="emerging-modularity-real-world"> UT Egocentric Dataset
+                <input value="savi++" type="radio" name="tiktok-model"> SAVi++
               </label>
             </div>
           </div>
-          <div id="pose_loading" style="position: absolute; left: 50%; top: 45%;"></div>
-          <img src="./static/gifs/tiktok/more_samples.gif" id="emerging-modularity-real-world" width="80%" alt="Emergent Modularity in Real-World Videos">
+          <img src="./static/gifs/tiktok/slotssm/more_samples.gif" id="tiktok-results" width="80%" alt="TikTok Dataset Results">
           <p>&nbsp;</p>
-          <h2 class="subtitle has-text-centered" style="margin-top: 0px;">
-            We applied OC-SlotSSMs to a depth estimation task on real-world datasets. SlotSSMs is capable of exploiting modular representations 
-            to understand scene structures in real-world videos, without explicit segmentation supervision. We show slot decomposition and depth estimation in the videos.
-          </h2>
-          <h2 class="subtitle has-text-centered ps-section" style="margin-top: 0px;">
-            Note that, in this task, our goal is not to surpass existing depth estimation models but to use this task, manageable with our 
-            lab resources, to showcase the emerging modularity in SlotSSMs for real-world video processing. For the TikTok dataset, we manually changed the 
-            colors for two background slots to grey for a more aesthetically pleasing visualization. 
-            Details of this experiment will be updated in the arXiv manuscript soon.
-          </h2>
+          <h3 class="title is-4">Waymo Dataset Results</h3>
+          <!-- <p>&nbsp;</p> -->
+          <div class="columns is-centered" style="position: relative;">
+            <div class="control has-text-centered">
+              <label class="radio" style="font-size: 20px;">
+                <input value="slotssm" type="radio" name="waymo-model"> SlotSSM (Ours)
+              </label>
+              <label class="radio" style="font-size: 20px;">
+                <input value="savi++" type="radio" name="waymo-model"> SAVi++
+              </label>
+            </div>
+          </div>
+          <img src="./static/gifs/waymo/slotssm/more_samples.gif" id="waymo-results" width="80%" alt="Waymo Dataset Results">
+          <p>&nbsp;</p>
+          <h3 class="title is-4">UT Egocentric Dataset Results</h3>
+          <!-- <p>&nbsp;</p> -->
+          <div class="columns is-centered" style="position: relative;">
+            <div class="control has-text-centered">
+              <label class="radio" style="font-size: 20px;">
+                <input value="slotssm" type="radio" name="egtea-model"> SlotSSM (Ours)
+              </label>
+              <label class="radio" style="font-size: 20px;">
+                <input value="savi++" type="radio" name="egtea-model"> SAVi++
+              </label>
+            </div>
+          </div>
+          <img src="./static/gifs/egtea/slotssm/more_samples.gif" id="egtea-results" width="80%" alt="EGTEA Dataset Results">
         </div>
       </div>
-      <!-- Real-World Emergent Modularity. -->
+
+      <h2 class="subtitle has-text-centered" style="margin-top: 0px;">
+        We applied OC-SlotSSMs to a depth estimation task on real-world datasets. SlotSSMs is capable of exploiting modular representations 
+        to understand scene structures in real-world videos, without explicit segmentation supervision. We show slot decomposition and depth estimation in the videos.
+      </h2>
+
+      <h2 class="subtitle has-text-centered ps-section" style="margin-top: 20px;">
+        Note: In this task, our goal is not to surpass existing depth estimation models but to use this task, manageable with our 
+        lab resources, to showcase the emerging modularity in SlotSSMs for real-world video processing. For the TikTok dataset, we manually changed the 
+        colors for two background slots to grey for a more aesthetically pleasing visualization. 
+      </h2>
 
     </div>
   </section>
